@@ -1,0 +1,168 @@
+\documentclass[notes,11pt, aspectratio=169]{beamer}
+
+\usepackage{pgfpages}
+% These slides also contain speaker notes. You can print just the slides,
+% just the notes, or both, depending on the setting below. Comment out the want
+% you want.
+\setbeameroption{hide notes} % Only slide
+%\setbeameroption{show only notes} % Only notes
+%\setbeameroption{show notes on second screen=right} % Both
+
+\usepackage{helvet}
+\usepackage[default]{lato}
+\usepackage{array}
+\usepackage{bm}
+\usepackage{longtable}
+
+\usepackage{tikz}
+\usepackage{verbatim}
+\setbeamertemplate{note page}{\pagecolor{yellow!5}\insertnote}
+\usetikzlibrary{positioning}
+\usetikzlibrary{snakes}
+\usetikzlibrary{calc}
+\usetikzlibrary{arrows}
+\usetikzlibrary{decorations.markings}
+\usetikzlibrary{shapes.misc}
+\usetikzlibrary{matrix,shapes,arrows,fit,tikzmark}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{lipsum}
+\usepackage{multimedia}
+\usepackage{graphicx}
+\usepackage{multirow}
+\usepackage{graphicx}
+\usepackage{dcolumn}
+\usepackage{bbm}
+\usepackage{adjustbox}
+\newcolumntype{d}[0]{D{.}{.}{5}}
+
+\usepackage{changepage}
+\usepackage{appendixnumberbeamer}
+\newcommand{\backupbegin}{
+	\newcounter{finalframe}
+	\setcounter{finalframe}{\value{framenumber}}
+}
+\newcommand{\backupend}{
+	\setcounter{framenumber}{\value{finalframe}}
+}
+
+	
+	\usepackage{graphicx}
+	\usepackage[space]{grffile}
+	\usepackage{booktabs}
+	
+	% These are my colors -- there are many like them, but these ones are mine.
+	\definecolor{blue}{RGB}{9,41,109}
+	\definecolor{red}{RGB}{213,94,0}
+	\definecolor{yellow}{RGB}{240,228,66}
+	\definecolor{green}{RGB}{0,158,115}
+	
+
+	
+	\hypersetup{
+		colorlinks=false,
+		linkbordercolor = {white},
+		linkcolor = {blue}
+	}
+	
+	
+	%% I use a beige off white for my background
+	\definecolor{MyBackground}{RGB}{255,253,250}
+	
+	%% Uncomment this if you want to change the background color to something else
+	\setbeamercolor{background canvas}{bg=MyBackground}
+	
+	%% Change the bg color to adjust your transition slide background color!
+	\newenvironment{transitionframe}{
+		\setbeamercolor{background canvas}{bg=yellow}
+		\begin{frame}}{
+		\end{frame}
+	}
+
+
+	
+	\setbeamercolor{frametitle}{fg=blue}
+	\setbeamercolor{title}{fg=black}
+	\setbeamertemplate{footline}[frame number]
+	\setbeamertemplate{navigation symbols}{} 
+	\setbeamertemplate{itemize items}{-}
+	\setbeamercolor{itemize item}{fg=blue}
+	\setbeamercolor{itemize subitem}{fg=blue}
+	\setbeamercolor{enumerate item}{fg=blue}
+	\setbeamercolor{enumerate subitem}{fg=blue}
+	\setbeamercolor{button}{bg=MyBackground,fg=blue,}
+	
+	
+	
+	% If you like road maps, rather than having clutter at the top, have a roadmap show up at the end of each section 
+	% (and after your introduction)
+%	% Uncomment this is if you want the roadmap!
+	 \AtBeginSection[]
+	 {
+	    \begin{frame}
+	        \frametitle{Outline}
+	        \tableofcontents[currentsection,     subsectionstyle=hide
+	        ]
+
+	        
+	    \end{frame}
+	 }
+	\setbeamercolor{section in toc}{fg=blue}
+	\setbeamercolor{subsection in toc}{fg=red}
+	\setbeamersize{text margin left=1em,text margin right=1em} 
+	
+	\newenvironment{wideitemize}{\itemize\addtolength{\itemsep}{10pt}}{\enditemize}
+	
+	\newenvironment{wideenumerate}{\enumerate\addtolength{\itemsep}{10pt}}{\endenumerate}
+
+%----------------------------------------------------------------------------------------
+%	TITLE PAGE
+%----------------------------------------------------------------------------------------
+
+\title[Short Title]{Title} % The short title appears at the bottom of every slide, the full title is only on the title page
+
+\author{} % Your name
+\institute[SMU] % Your institution as it will appear on the bottom of every slide, may be shorthand to save space
+{ {\begin{tabular}{c c}
+		 Nathaniel Pattison \\
+		 Southern Methodist University\\
+		\end{tabular} 
+	}
+\\
+
+}
+\date{\today} % Date, can be changed to a custom date
+
+\begin{document}
+
+\begin{frame}
+\titlepage % Print the title page as the first slide
+\end{frame}
+%
+
+
+
+
+%----------------------------------------------------------------------------------------
+%	PRESENTATION SLIDES
+%----------------------------------------------------------------------------------------
+
+
+
+
+
+
+\backupbegin
+\begin{frame}{}
+\centering \Large
+Thank you
+\end{frame}
+
+
+
+
+
+
+
+\backupend
+\end{document} 

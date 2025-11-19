@@ -1,0 +1,92 @@
+
+\documentclass[11pt]{article}
+
+% -----------------------------------
+% Packages
+% -----------------------------------
+
+% Math
+\usepackage{amsmath, amssymb, amsthm, bbm}
+
+% Graphics and figures
+\usepackage{graphicx, subfigure}
+\usepackage[justification=centering, singlelinecheck=false, font=small, format=plain, labelfont=bf, textfont=normal]{caption}
+
+% Tables
+\usepackage{booktabs, longtable, tabularx, array}
+\usepackage{threeparttable}
+
+% Page layout
+\usepackage[margin=1in]{geometry}
+\usepackage{lscape}       % for landscape pages
+\usepackage{placeins}     % for \FloatBarrier
+
+% Text formatting
+\usepackage{ragged2e}
+\usepackage{setspace}
+\onehalfspacing
+
+% References and citations
+\usepackage{natbib}
+
+% Misc
+\usepackage{appendix}
+\usepackage{verbatim}     % for block comments
+
+\newcommand{\inputns}[1]{\input{#1}\unskip}
+
+% -----------------------------------
+% Title and author
+% -----------------------------------
+
+\title{Title}
+\author{Nathaniel Pattison\textsuperscript{1} \\
+	Southern Methodist University}
+\date{\today}
+
+\linespread{2} %-- Uncomment for Double Space
+\begin{document}
+\begin{titlepage}
+\maketitle
+\thispagestyle{empty}
+
+\singlespacing
+\abstract{
+Abstract
+}
+\footnotetext[1]{ %-- left and right positions in the header
+ Thanks
+}
+\end{titlepage}
+
+
+
+\pagebreak
+\section{Introduction}
+
+
+\bibliographystyle{apalike}  % or try: plainnat, abbrvnat, etc.
+\bibliography{ref.bib}
+
+\pagebreak
+
+\FloatBarrier
+
+\appendix
+
+\clearpage
+\pagenumbering{arabic}
+\renewcommand{\thepage}{A.\arabic{page}}
+\setcounter{page}{1}
+
+
+\section{Appendix Tables and Figures}
+
+
+\end{document}
+
+
+
+
+
+
