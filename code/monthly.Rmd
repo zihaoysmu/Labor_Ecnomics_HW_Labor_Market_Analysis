@@ -1,0 +1,71 @@
+---
+title: "Untitled"
+output: html_document
+date: "2025-11-19"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+install.packages("janitor")
+library(janitor)
+library(haven)
+library(ggplot2)
+library(dplyr)
+library(survey)
+data <- read_dta("C:/document/SMU PhD/Class/labor/labor market analysis/00_project_template/data/clean/baker in backery.dta")
+
+dsgn <-svydesign(ids=~1, weights=~wtfinl, data=data)
+```
+
+
+```{r change across month, echo=FALSE}
+#1270 is non-retail, 1190 is retail
+  
+df_count <- data %>%
+  filter(ind==1270)%>%
+  group_by(year, month) %>%
+  summarise(n = sum(wtfinl))
+
+
+ggplot(df_count, aes(x = month, y = n, color = factor(year), group = year)) +
+  geom_line(size = 1) +
+  scale_x_continuous(breaks = 1:12) +
+  labs(
+    x = "Month",
+    y = "Value",
+    color = "Year",
+    title = "Monthly Changes of var by Year"
+  ) +
+  theme_minimal()
+
+# no apparent pattern
+```
+
+
+
+```{r, echo=FALSE}
+dsgn_retail<-subset(dsgn, ind==1190)
+dsgn_nretail<-subset(dsgn, ind==1270)
+
+#union
+svymean(~union, design = dsgn_retail)
+svymean(~union, design = dsgn_nretail)
+#license
+svymean(~jobcert, design = dsgn_retail)
+svymean(~jobcert, design = dsgn_nretail)
+# not applied
+
+#sex
+svymean(~sex, design = dsgn_retail)
+svymean(~sex, design = dsgn_nretail)
+# non-retail has more male
+
+#wage
+
+
+```
+
+
+```{r pressure, echo=FALSE}
+
+```
