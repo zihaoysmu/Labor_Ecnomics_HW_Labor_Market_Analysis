@@ -1,10 +1,16 @@
 ---
-title: "Untitled"
-output: html_document
+title: "Bakers in retail and non-retail backery"
+output:
+  pdf_document: default
+  html_document: default
+  knitr:
+  opts_chunk:
+    warning: false
+    message: false
 date: "2025-11-19"
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include=FALSE,warning=FALSE, message=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(janitor)
 library(haven)
@@ -12,9 +18,10 @@ library(ggplot2)
 library(dplyr)
 library(survey)
 library(patchwork)
+library(tibble)
+library(knitr)
+library(kableExtra)
 data <- read_dta("C:/document/SMU PhD/Class/labor/labor market analysis/00_project_template/data/clean/march_baker in backery.dta")
-
-dsgn <-svydesign(ids=~1, weights=~wtfinl, data=data)
 ```
 
 
@@ -24,7 +31,10 @@ dsgn <-svydesign(ids=~1, weights=~wtfinl, data=data)
 # Exclude income outlier, add var
 data=data %>% 
   filter(inctot<300000) %>% 
-  mutate(part=ifelse(wkstat %in% c(14,15,20,22,40,41,42,50,60,99),1,0))
+  mutate(part=ifelse(wkstat %in% c(14,15,20,22,40,41,42,50,60,99),1,0),
+         white=ifelse(race==100 & hispan==0, 1,0),
+         college=ifelse(schlcoll %in% c(3,4),1,0),
+         hispan=ifelse(hispan %in% c(0,901,902), 0,1))
   
 df_count_nretial <- data %>%
   filter(ind==1270)%>%
@@ -41,9 +51,23 @@ df_count_retial <- data %>%
     n=n()
     )
 
+df_count_nretial_wkr <- data %>%
+  filter(ind==1270,classwkr==21)%>%
+  group_by(year) %>%
+  summarise(
+    emp = sum(asecwt),
+    n=n()
+    )
+df_count_retial_wkr <- data %>%
+  filter(ind==1190,classwkr==21)%>%
+  group_by(year) %>%
+  summarise(
+    emp = sum(asecwt),
+    n=n()
+    )
 ##
 p1=ggplot(df_count_nretial, aes(x = year, y = n)) +
-  geom_line(size = 1) +
+  geom_line(linewidth = 1) +
   scale_x_continuous(breaks = 1:12) +
   labs(
     x = "Year",
@@ -54,7 +78,7 @@ p1=ggplot(df_count_nretial, aes(x = year, y = n)) +
   theme_minimal()
 
 p2=ggplot(df_count_retial, aes(x = year, y = n)) +
-  geom_line(size = 1) +
+  geom_line(linewidth = 1) +
   scale_x_continuous(breaks = 1:12) +
   labs(
     x = "Year",
@@ -65,7 +89,7 @@ p2=ggplot(df_count_retial, aes(x = year, y = n)) +
   theme_minimal()
 
 p3=ggplot(df_count_nretial, aes(x = year, y = emp)) +
-  geom_line(size = 1) +
+  geom_line(linewidth = 1) +
   scale_x_continuous(breaks = 1:12) +
   labs(
     x = "Year",
@@ -76,7 +100,7 @@ p3=ggplot(df_count_nretial, aes(x = year, y = emp)) +
   theme_minimal()
 
 p4=ggplot(df_count_retial, aes(x = year, y = emp)) +
-  geom_line(size = 1) +
+  geom_line(linewidth = 1) +
   scale_x_continuous(breaks = 1:12) +
   labs(
     x = "Year",
@@ -94,88 +118,144 @@ p4=ggplot(df_count_retial, aes(x = year, y = emp)) +
 
 
 ```{r, echo=FALSE}
-#sex, 0 is male
 
-mean_sex_retail <- with(data %>% filter(ind==1190), sum(asecwt * sex) / sum(asecwt))-1
-mean_sex_nretail <- with(data %>% filter(ind==1270), sum(asecwt * sex) / sum(asecwt))-1
-
-#Non-retail has more males
 
 #income
-mean_inctot_retail = with(data %>% filter(ind==1190), sum(asecwt*inctot)/sum(asecwt))
-mean_inctot_nretail = with(data %>% filter(ind==1270), sum(asecwt*inctot)/sum(asecwt))
+# mean_inctot_retail = with(data %>% filter(ind==1190), sum(asecwt*inctot)/sum(asecwt))
+# mean_inctot_nretail = with(data %>% filter(ind==1270), sum(asecwt*inctot)/sum(asecwt))
+# 
+# mean_incwage_retail = with(data %>% filter(ind==1190), sum(asecwt*incwage)/sum(asecwt))
+# mean_incwage_nretail = with(data %>% filter(ind==1270), sum(asecwt*incwage)/sum(asecwt))
+# 
+# self_retail = with(data %>% filter(ind==1190), sum(asecwt[classwkr %in% c(13,14)])/sum(asecwt))
+# self_nretail = with(data %>% filter(ind==1270), sum(asecwt[classwkr %in% c(13,14)])/sum(asecwt))
+# 
+# self_corporated_retail = with(data %>% filter(ind==1190), sum(asecwt[classwkr %in% c(14)])/sum(asecwt))
+# self_corporated_nretail = with(data %>% filter(ind==1270), sum(asecwt[classwkr %in% c(14)])/sum(asecwt))
+# 
+# mean_incwage_worker_retail = with(data %>% filter(ind==1190,classwkr==21), sum(asecwt*incwage)/sum(asecwt))
+# mean_incwage_worker_nretail = with(data %>% filter(ind==1270,classwkr==21), sum(asecwt*incwage)/sum(asecwt))
+# 
+# part_retail = with(data %>% filter(ind==1190), sum(asecwt[part == 1])/sum(asecwt))
+# part_nretail = with(data %>% filter(ind==1270), sum(asecwt[part == 1])/sum(asecwt))
+# 
+# mean_incwage_fulwrk_retail = with(data %>% filter(ind==1190,classwkr==21,part==0), sum(asecwt*incwage)/sum(asecwt))
+# mean_incwage_fulwrk_nretail = with(data %>% filter(ind==1270,classwkr==21,part==0), sum(asecwt*incwage)/sum(asecwt))
+# mean_incwage_ptwrk_retail = with(data %>% filter(ind==1190,classwkr==21,part==1), sum(asecwt*incwage)/sum(asecwt))
+# mean_incwage_ptwrk_nretail = with(data %>% filter(ind==1270,classwkr==21,part==1), sum(asecwt*incwage)/sum(asecwt))
 
-mean_incwage_retail = with(data %>% filter(ind==1190), sum(asecwt*incwage)/sum(asecwt))
-mean_incwage_nretail = with(data %>% filter(ind==1270), sum(asecwt*incwage)/sum(asecwt))
+#diff of income across years
+diff_incwage = data %>% 
+  group_by(year) %>% 
+  summarise(diff=sum(asecwt[ind==1190]*incwage[ind==1190])/sum(asecwt[ind==1190])-sum(asecwt[ind==1270]*incwage[ind==1270])/sum(asecwt[ind==1270]),
+            diff_wkr=sum(asecwt[ind==1190& classwkr==21]*incwage[ind==1190& classwkr==21])/sum(asecwt[ind==1190& classwkr==21])-sum(asecwt[ind==1270& classwkr==21]*incwage[ind==1270& classwkr==21])/sum(asecwt[ind==1270& classwkr==21]),
+            diff_ful=sum(asecwt[ind==1190 & classwkr==21 & part==0]*incwage[ind==1190& classwkr==21 & part==0])/sum(asecwt[ind==1190& classwkr==21 & part==0])-sum(asecwt[ind==1270& classwkr==21 & part==0]*incwage[ind==1270& classwkr==21 & part==0])/sum(asecwt[ind==1270& classwkr==21 & part==0]),
+            diff_part=sum(asecwt[ind==1190 & classwkr==21 & part==1]*incwage[ind==1190& classwkr==21 & part==1])/sum(asecwt[ind==1190& classwkr==21 & part==1])-sum(asecwt[ind==1270& classwkr==21 & part==1]*incwage[ind==1270& classwkr==21 & part==1])/sum(asecwt[ind==1270& classwkr==21 & part==1]))
 
-self_retail = with(data %>% filter(ind==1190), sum(asecwt[classwkr %in% c(13,14)])/sum(asecwt))
-self_nretail = with(data %>% filter(ind==1270), sum(asecwt[classwkr %in% c(13,14)])/sum(asecwt))
+#diff of hourly wage 
+diff_hwage = data %>% 
+  filter(wkswork1!=0 & uhrsworkly!=999) %>% 
+  group_by(year) %>% 
+  summarise(
+    diff=sum(incwage[ind==1190]/(wkswork1[ind==1190]*uhrsworkly[ind==1190])*asecwt[ind==1190])/sum(asecwt[ind==1190])-sum(incwage[ind==1270]/(wkswork1[ind==1270]*uhrsworkly[ind==1270])*asecwt[ind==1270])/sum(asecwt[ind==1270]),
+    diff_wkr=sum(incwage[ind==1190& classwkr==21]/(wkswork1[ind==1190& classwkr==21]*uhrsworkly[ind==1190& classwkr==21])*asecwt[ind==1190& classwkr==21])/sum(asecwt[ind==1190& classwkr==21])-sum(incwage[ind==1270& classwkr==21]/(wkswork1[ind==1270& classwkr==21]*uhrsworkly[ind==1270& classwkr==21])*asecwt[ind==1270& classwkr==21])/sum(asecwt[ind==1270& classwkr==21]),
+    diff_full=sum(incwage[ind==1190& classwkr==21& part==0]/(wkswork1[ind==1190& classwkr==21& part==0]*uhrsworkly[ind==1190& classwkr==21& part==0])*asecwt[ind==1190& classwkr==21& part==0])/sum(asecwt[ind==1190& classwkr==21& part==0])-sum(incwage[ind==1270& classwkr==21& part==0]/(wkswork1[ind==1270& classwkr==21& part==0]*uhrsworkly[ind==1270& classwkr==21& part==0])*asecwt[ind==1270& classwkr==21& part==0])/sum(asecwt[ind==1270& classwkr==21& part==0]),
+    retail_full=sum(incwage[ind==1190& classwkr==21& part==0]/(wkswork1[ind==1190& classwkr==21& part==0]*uhrsworkly[ind==1190& classwkr==21& part==0])*asecwt[ind==1190& classwkr==21& part==0])/sum(asecwt[ind==1190& classwkr==21& part==0]),
+    nretail_full=sum(incwage[ind==1270& classwkr==21& part==0]/(wkswork1[ind==1270& classwkr==21& part==0]*uhrsworkly[ind==1270& classwkr==21& part==0])*asecwt[ind==1270& classwkr==21& part==0])/sum(asecwt[ind==1270& classwkr==21& part==0]))
 
-self_corporated_retail = with(data %>% filter(ind==1190), sum(asecwt[classwkr %in% c(14)])/sum(asecwt))
-self_corporated_nretail = with(data %>% filter(ind==1270), sum(asecwt[classwkr %in% c(14)])/sum(asecwt))
-
-mean_incwage_worker_retail = with(data %>% filter(ind==1190,classwkr==21), sum(asecwt*incwage)/sum(asecwt))
-mean_incwage_worker_nretail = with(data %>% filter(ind==1270,classwkr==21), sum(asecwt*incwage)/sum(asecwt))
-
-part_retail = with(data %>% filter(ind==1190), sum(asecwt[part == 1])/sum(asecwt))
-part_nretail = with(data %>% filter(ind==1270), sum(asecwt[part == 1])/sum(asecwt))
-
-mean_incwage_fulwrk_retail = with(data %>% filter(ind==1190,classwkr==21,part==0), sum(asecwt*incwage)/sum(asecwt))
-mean_incwage_fulwrk_nretail = with(data %>% filter(ind==1270,classwkr==21,part==0), sum(asecwt*incwage)/sum(asecwt))
-mean_incwage_ptwrk_retail = with(data %>% filter(ind==1190,classwkr==21,part==1), sum(asecwt*incwage)/sum(asecwt))
-mean_incwage_ptwrk_nretail = with(data %>% filter(ind==1270,classwkr==21,part==1), sum(asecwt*incwage)/sum(asecwt))
-
-#2014 
-mean_incwage_retail14 = with(data %>% filter(ind==1190,year==2014), sum(asecwt*incwage)/sum(asecwt))
-mean_incwage_nretail14 = with(data %>% filter(ind==1270,year==2014), sum(asecwt*incwage)/sum(asecwt))
-mean_incwage_fulwrk_retail14 = with(data %>% filter(ind==1190,classwkr==21,part==0,year==2014), sum(asecwt*incwage)/sum(asecwt))
-mean_incwage_fulwrk_nretail14 = with(data %>% filter(ind==1270,classwkr==21,part==0,year==2014), sum(asecwt*incwage)/sum(asecwt))
-mean_incwage_ptwrk_retail14 = with(data %>% filter(ind==1190,classwkr==21,part==1,year==2014), sum(asecwt*incwage)/sum(asecwt))
-mean_incwage_ptwrk_nretail14 = with(data %>% filter(ind==1270,classwkr==21,part==1,year==2014), sum(asecwt*incwage)/sum(asecwt))
-
-p5=ggplot(data %>% filter(ind==1190), aes(x = inctot, weight = asecwt)) +
-  geom_histogram(bins = 30, fill = "skyblue", color = "white") +
+p9=ggplot(diff_incwage,aes(x=year)) +
+  scale_x_continuous(breaks = seq(min(diff_incwage$year), max(diff_incwage$year), by = 1))+
+  geom_line(aes(y=diff,color = "Income Diff"),linewidth=1.2) +
+  geom_line(aes(y=diff_wkr,color="Income Diff for Worker"),linewidth=1.2)+
+  geom_line(aes(y=diff_ful, color="Income Diff for Full-time Worker"),linewidth=1.2)+
   labs(
-    x = "Total Income",
-    y = "Weighted Count",
-    title = "Hist of Total Income for Retail"
-  ) +
-  theme_minimal()
+    x = "Year",
+    y = "Income Diff",
+    title = "Income Diff across Different Subgroup"
+  ) + theme_minimal()+
+  theme(legend.position = "bottom")
 
-p6=ggplot(data %>% filter(ind==1270), aes(x = inctot, weight = asecwt)) +
-  geom_histogram(bins = 30, fill = "skyblue", color = "white") +
+p10=ggplot(diff_hwage, aes(x=year)) +
+  scale_x_continuous(breaks = seq(min(diff_incwage$year), max(diff_incwage$year), by = 1))+
+  geom_line(aes(y=diff,color = "Hourly wage Diff"),linewidth=1) +
+  geom_line(aes(y=diff_wkr,color="Hourly wage Diff for Worker"),linewidth=1)+
+  geom_line(aes(y=diff_full, color="Hourly wage Diff for Full-time Worker"),linewidth=1)+
   labs(
-    x = "Total Income",
-    y = "Weighted Count",
-    title = "Hist of Total Income for Non-retail"
+    x = "Year",
+    y = "Hourly wage Diff",
+    title = "Hourly wage Diff across Different Subgroup"
   ) +
-  theme_minimal()
-p7=ggplot(data %>% filter(ind==1190), aes(x = incwage, weight = asecwt)) +
-  geom_histogram(bins = 30, fill = "skyblue", color = "white") +
-  labs(
-    x = "Total Income",
-    y = "Weighted Count",
-    title = "Hist of Wage Income for Retail"
-  ) +
-  theme_minimal()
+  theme_minimal()+
+  theme(legend.position = "bottom")
+table1=tibble(diff_hwage)
+table1 %>% 
+  kable(caption = "Diff: retail - nonretail")
+p9
+p10
 
-p8=ggplot(data %>% filter(ind==1270), aes(x = incwage, weight = asecwt)) +
-  geom_histogram(bins = 30, fill = "skyblue", color = "white") +
-  labs(
-    x = "Total Income",
-    y = "Weighted Count",
-    title = "Hist of Wage Income of Non-retail"
-  ) +
-  theme_minimal()
 
-(p5+p6)/(p7+p8)
 
-#Non-retail has higher total income
+# p5=ggplot(data %>% filter(ind==1190), aes(x = inctot, weight = asecwt)) +
+#   geom_histogram(bins = 30, fill = "skyblue", color = "white") +
+#   labs(
+#     x = "Total Income",
+#     y = "Weighted Count",
+#     title = "Hist of Total Income for Retail"
+#   ) +
+#   theme_minimal()
+# 
+# p6=ggplot(data %>% filter(ind==1270), aes(x = inctot, weight = asecwt)) +
+#   geom_histogram(bins = 30, fill = "skyblue", color = "white") +
+#   labs(
+#     x = "Total Income",
+#     y = "Weighted Count",
+#     title = "Hist of Total Income for Non-retail"
+#   ) +
+#   theme_minimal()
+# p7=ggplot(data %>% filter(ind==1190), aes(x = incwage, weight = asecwt)) +
+#   geom_histogram(bins = 30, fill = "skyblue", color = "white") +
+#   labs(
+#     x = "Total Income",
+#     y = "Weighted Count",
+#     title = "Hist of Wage Income for Retail"
+#   ) +
+#   theme_minimal()
+# 
+# p8=ggplot(data %>% filter(ind==1270), aes(x = incwage, weight = asecwt)) +
+#   geom_histogram(bins = 30, fill = "skyblue", color = "white") +
+#   labs(
+#     x = "Total Income",
+#     y = "Weighted Count",
+#     title = "Hist of Wage Income of Non-retail"
+#   ) +
+#   theme_minimal()
+# 
+# (p5+p6)/(p7+p8)
 
 
 ```
 
 
 ```{r pressure, echo=FALSE}
+#sex, 0 is male
+#white, 1 is non_Hispanic white
+#college, 1 if college
+#
+#no union
+#
+Dem = data %>% 
+  group_by(year) %>% 
+  summarise(
+    diff_sex=sum(asecwt[ind==1190& classwkr==21& part==0] * sex[ind==1190& classwkr==21& part==0]) / sum(asecwt[ind==1190& classwkr==21& part==0])-sum(asecwt[ind==1270& classwkr==21& part==0] * sex[ind==1270& classwkr==21& part==0]) / sum(asecwt[ind==1270& classwkr==21& part==0]),
+    diff_white=sum(asecwt[ind==1190& classwkr==21& part==0] * white[ind==1190& classwkr==21& part==0]) / sum(asecwt[ind==1190& classwkr==21& part==0])-sum(asecwt[ind==1270& classwkr==21& part==0] * white[ind==1270& classwkr==21& part==0]) / sum(asecwt[ind==1270& classwkr==21& part==0]),
+    diff_age=sum(asecwt[ind==1190& classwkr==21& part==0] * age[ind==1190& classwkr==21& part==0]) / sum(asecwt[ind==1190& classwkr==21& part==0])-sum(asecwt[ind==1270& classwkr==21& part==0] * age[ind==1270& classwkr==21& part==0]) / sum(asecwt[ind==1270& classwkr==21& part==0]),
+    diff_college=sum(asecwt[ind==1190& classwkr==21& part==0] * college[ind==1190& classwkr==21& part==0]) / sum(asecwt[ind==1190& classwkr==21& part==0])-sum(asecwt[ind==1270& classwkr==21& part==0] * college[ind==1270& classwkr==21& part==0]) / sum(asecwt[ind==1270& classwkr==21& part==0]),
+    diff_hispan=sum(asecwt[ind==1190& classwkr==21& part==0] * hispan[ind==1190& classwkr==21& part==0]) / sum(asecwt[ind==1190& classwkr==21& part==0])-sum(asecwt[ind==1270& classwkr==21& part==0] * hispan[ind==1270& classwkr==21& part==0]) / sum(asecwt[ind==1270& classwkr==21& part==0]))
+table2=tibble(Dem)
+table2 %>% 
+  kable(caption = "Diff: retail - nonretail")
 
+cov=with(diff_hwage,cor(retail_full,nretail_full))
 ```
+
+The wage correlation coefficient between retail and nonretail industry is `r cov`
